@@ -1,0 +1,177 @@
+// ============================================
+// Spécification CORBA - Calculatrice Avancée
+// ============================================
+
+/**
+ * Module principal encapsulant toutes les interfaces
+ * Les modules organisent les namespaces pour éviter les conflits
+ */
+module CalculatriceApp 
+{
+  /**
+   * Exception personnalisée : Division par zéro
+   * Levée quand on essaie de diviser par zéro
+   */
+  exception DivisionParZeroException
+  {
+    string message;  // Message d'erreur détaillé
+  };
+
+  /**
+   * Exception personnalisée : Opération non supportée
+   * Levée quand une opération demandée n'existe pas
+   */
+  exception OperationNonSupporteeException
+  {
+    string operation;  // Nom de l'opération
+    string raison;     // Raison du refus
+  };
+
+  /**
+   * Structure pour encapsuler un résultat complexe
+   * Contient le résultat et des métadonnées
+   */
+  struct ResultatCalcul
+  {
+    double valeur;           // Le résultat numérique
+    string operationEffectuee; // Description de l'opération
+    long timestampUnix;      // Moment du calcul (timestamp)
+  };
+
+  /**
+   * Énumération des opérations disponibles
+   */
+  enum TypeOperation
+  {
+    ADDITION,      // +
+    SOUSTRACTION,  // -
+    MULTIPLICATION, // *
+    DIVISION,      // /
+    MODULO,        // %
+    PUISSANCE      // ^
+  };
+
+  /**
+   * Interface principale : Calculatrice
+   * 
+   * Fournit des opérations mathématiques variées
+   * sur deux nombres flottants
+   */
+  interface Calculatrice
+  {
+    /**
+     * Effectue l'addition de deux nombres
+     * @param a Premier opérande
+     * @param b Deuxième opérande
+     * @return Le résultat de a + b
+     */
+    double add(in double a, in double b);
+
+    /**
+     * Effectue la soustraction
+     * @param a Minuende
+     * @param b Soustrahende
+     * @return Le résultat de a - b
+     */
+    double substract(in double a, in double b);
+
+    /**
+     * Effectue la multiplication
+     * @param a Premier facteur
+     * @param b Deuxième facteur
+     * @return Le résultat de a * b
+     */
+    double multiply(in double a, in double b);
+
+    /**
+     * Effectue la division avec vérification
+     * @param numerateur Dividende
+     * @param denominateur Diviseur
+     * @return Le résultat de numerateur / denominateur
+     * @throws DivisionParZeroException si denominateur == 0
+     */
+    double divide(in double numerateur, in double denominateur) 
+      raises (DivisionParZeroException);
+
+    /**
+     * Calcule le modulo (reste de la division entière)
+     * @param dividende Premier nombre
+     * @param diviseur Deuxième nombre
+     * @return Le reste de la division
+     * @throws DivisionParZeroException si diviseur == 0
+     */
+    long modulo(in long dividende, in long diviseur) 
+      raises (DivisionParZeroException);
+
+    /**
+     * Calcule la puissance (base ^ exposant)
+     * @param base La base
+     * @param exposant L'exposant (doit être ≥ 0)
+     * @return base ^ exposant
+     */
+    double power(in double base, in long exposant);
+
+    /**
+     * Opération générique avec type d'opération comme paramètre
+     * Permet de tester différentes opérations dynamiquement
+     * @param operation Le type d'opération à effectuer
+     * @param a Premier opérande
+     * @param b Deuxième opérande
+     * @return Structure contenant le résultat et les métadonnées
+     * @throws DivisionParZeroException si division par zéro
+     * @throws OperationNonSupporteeException si opération invalide
+     */
+    ResultatCalcul operationGenerique(
+      in TypeOperation operation,
+      in double a,
+      in double b
+    ) raises (
+      DivisionParZeroException,
+      OperationNonSupporteeException
+    );
+
+    /**
+     * Obtient le nombre d'opérations effectuées depuis le démarrage
+     * Utile pour le monitoring
+     * @return Nombre d'appels reçus
+     */
+    long getNombreOperations();
+
+    /**
+     * Réinitialise le compteur d'opérations
+     */
+    void reinitialiserCompteur();
+
+    /**
+     * Méthode de shutdown asynchrone (one-way)
+     * N'attend pas de réponse du serveur
+     * Arrête l'exécution du serveur proprement
+     */
+    oneway void shutdown();
+  };
+
+  /**
+   * Interface de gestion et monitoring
+   * Permet de surveiller l'état du serveur
+   */
+  interface GestionnaireServeur
+  {
+    /**
+     * Obtient le timestamp du démarrage du serveur
+     * @return Nombre de secondes depuis le démarrage (Unix timestamp)
+     */
+    long getTimestampDemarrage();
+
+    /**
+     * Obtient le statut du serveur
+     * @return Message descriptif du statut
+     */
+    string getStatut();
+
+    /**
+     * Obtient la version de la calculatrice
+     * @return Numéro de version (ex: "1.0.0")
+     */
+    string getVersion();
+  };
+};
