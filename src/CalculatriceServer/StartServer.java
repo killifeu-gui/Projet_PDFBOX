@@ -111,11 +111,9 @@ public class StartServer
                 );
 
                 System.out.println("    ✓ ior.txt généré");
+            } catch (Exception ex) {
+                System.err.println("[WARN] Impossible d'ecrire ior.txt : " + ex.getMessage());
             }
-        } catch (Exception ex) {
-            System.err.println("[WARN] Impossible d'écrire ior.txt : " + ex.getMessage());
-        }
-
 
             System.out.println();
             System.out.println("========================================");
@@ -128,13 +126,10 @@ public class StartServer
             System.out.println();
             System.out.println("Services : CalculatriceService, PdfService");
 
-
             // ===== ÉTAPE 5 : Attendre les invocations =====
             // Boucle infinie : le serveur attend les appels clients
             orb.run();
-        } 
-        catch (Exception e) 
-        {
+        } catch (Exception e) {
             System.err.println("******************************");
             System.err.println("ERREUR AU DEMARRAGE DU SERVEUR");
             System.err.println("******************************");
@@ -143,6 +138,6 @@ public class StartServer
             e.printStackTrace(System.out);
         }
         
-        System.out.println("[SERVEUR] Arrêt du serveur...");
+        System.out.println("[SERVEUR] Arret du serveur...");
     }
 }

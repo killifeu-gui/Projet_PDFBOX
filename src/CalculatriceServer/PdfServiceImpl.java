@@ -53,10 +53,8 @@ public class PdfServiceImpl extends PdfServicePOA
         ResultatPdf r = new ResultatPdf();
         r.succes = true;
         r.message = message;
-        // Dans ce TP on met le base64 résultat dans message si nomFichierSortie absent.
-        // Pour garder la signature IDL simple, on met base64 dans nomFichierSortie si rempli.
-        // (Le client peut le récupérer via nomFichierSortie)
-        r.nomFichierSortie = (sortieNomFichier != null ? sortieNomFichier : fichierBase64);
+        // On met le base64 résultat dans nomFichierSortie pour que le client puisse le récupérer
+        r.nomFichierSortie = fichierBase64;
         return r;
     }
 
@@ -236,8 +234,8 @@ public class PdfServiceImpl extends PdfServicePOA
             String text = stripper.getText(doc);
             ResultatPdf r = new ResultatPdf();
             r.succes = true;
-            r.message = text;
-            r.nomFichierSortie = null;
+            r.message = (text != null ? text : "");
+            r.nomFichierSortie = "";
             return r;
         }
         catch (Exception e)
