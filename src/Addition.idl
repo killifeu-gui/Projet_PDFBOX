@@ -8,6 +8,91 @@
  */
 module CalculatriceApp 
 {
+
+  // ============================================================
+  // Service PDF (PDFBox) - communication via base64
+  // ============================================================
+
+  /**
+   * Resultat générique pour opérations PDF
+   */
+  struct ResultatPdf
+  {
+    boolean succes;          // true si OK
+    string message;         // message d'état / erreur
+    string nomFichierSortie;// nom logique du résultat (optionnel)
+  };
+
+  /**
+   * Représente une plage de pages inclusive (1..N côté client)
+   */
+  struct PlagePages
+  {
+    long debut; // incluse
+    long fin;   // incluse
+  };
+
+  /**
+   * Interface principale PDF
+   * Les entrées/sorties PDF sont transmises en base64 (string).
+   */
+  interface PdfService
+  {
+    /** Fusionne 2 PDFs (input1 + input2) -> pdfBase64Out */
+    ResultatPdf fusionPdf(
+      in string pdfBase64_1,
+      in string pdfBase64_2
+    );
+
+    /** Découpe un PDF en une nouvelle sortie contenant uniquement la plage */
+    ResultatPdf decoupagePdf(
+      in string pdfBase64,
+      in PlagePages plage
+    );
+
+    /** Extraction d'une page (plage d'une page) -> nouveau PDF */
+    ResultatPdf extractionPage(
+      in string pdfBase64,
+      in PlagePages plage // utiliser debut==fin
+    );
+
+    /** Suppression des pages (définies par plage) -> PDF résultat */
+    ResultatPdf suppressionPage(
+      in string pdfBase64,
+      in PlagePages plage
+    );
+
+    /** Ajoute un mot de passe : protection du PDF en sortie */
+    ResultatPdf ajoutMotDePasse(
+      in string pdfBase64,
+      in string password
+    );
+
+    /** Convertit PDF -> image(s) (PNG)
+     * Simplification TP : renvoie base64 du premier rendu (page 1).
+     * Le champ nomFichierSortie contiendra par ex. "image1.png".
+     */
+    ResultatPdf conversionPdfEnImage(
+      in string pdfBase64,
+      in long dpi
+    );
+
+    /** Extrait le texte d'un PDF (retourne texte directement dans message + succes=true) */
+    ResultatPdf extractionTexte(
+      in string pdfBase64
+    );
+
+    /** Crée un PDF depuis un texte donné */
+    ResultatPdf creationPdf(
+      in string texte
+    );
+
+    /** Récupère le résultat binaire (base64) associé à un appel précédent
+     * (Pour rester simple côté CORBA : on renvoie le base64 de sortie via nomFichierSortie dans ce TP).
+     * => Ici on renvoie directement dans nomFichierSortie.
+     */
+  };
+
   /**
    * Exception personnalisée : Division par zéro
    * Levée quand on essaie de diviser par zéro
