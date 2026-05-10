@@ -1,6 +1,5 @@
 import CalculatriceApp.*;
-import org.omg.CosNaming.*;
-import org.omg.CosNaming.NamingContextPackage.*;
+import CalculatriceClient.CorbaClientHelper;
 import org.omg.CORBA.*;
 
 import java.io.File;
@@ -15,72 +14,43 @@ public class StartPdfClientConversionEtTexte {
 
     public static void main(String[] args) {
         try {
-            // args:
-            // [0]=pdf input
-            // [1]=outImage.png
-            // [2]=dpi (optionnel)
+            // args[0]=pdf
+            // args[1]=outputPath (image)
+            // args[2]=dpi
 
-            String inPath = (args.length > 0 ? args[0] : "input.pdf");
-            String outImgPath = (args.length > 1 ? args[1] : "image1.png");
+            String pdfPath = (args.length > 0 ? args[0] : "input1.pdf");
+            String outputPath = (args.length > 1 ? args[1] : "output.png");
             int dpi = (args.length > 2 ? Integer.parseInt(args[2]) : 150);
 
+            // ORB comme dans StartClient.
             ORB orb = ORB.init(args, null);
 
-            PdfService pdf = null;
-            try {
-                // 1) Essayer NamingService
-                org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
-                NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
-                org.omg.CORBA.Object refObj = ncRef.resolve_str("PdfService");
-                pdf = PdfServiceHelper.narrow(refObj);
-            } catch (Exception e) {
-                // 2) Fallback via IOR file
-                try {
-                    java.nio.file.Path p = java.nio.file.Paths.get("c:/RONDOMNUMBER9/TP_Corba/ior.txt");
-                    String txt = new String(java.nio.file.Files.readAllBytes(p), java.nio.charset.StandardCharsets.UTF_8);
-                    String iorPdf = null;
-                    for (String line : txt.split("\\r?\\n")) {
-                        if (line.startsWith("IOR_PDF=")) {
-                            iorPdf = line.substring("IOR_PDF=".length()).trim();
-                        }
-                    }
-                    if (iorPdf == null) throw new RuntimeException("IOR_PDF absent dans ior.txt");
+            PdfService pdf = CorbaClientHelper.getPdfService(orb);
 
-                    org.omg.CORBA.Object iorObj = orb.string_to_object(iorPdf);
-                    pdf = PdfServiceHelper.narrow(iorObj);
-                    System.out.println("[INFO] PdfService récupéré via ior.txt");
-                } catch (Exception e2) {
-                    throw new RuntimeException("Impossible de contacter NamingService et impossible de lire ior.txt", e2);
-                }
-            }
+            String pdfB64 = readFileToBase64(pdfPath);
 
-
-
-
-            String inB64 = readFileToBase64(inPath);
-
-            // Conversion -> png base64 (mis dans nomFichierSortie)
-            ResultatPdf img = pdf.conversionPdfEnImage(inB64, dpi);
-            if (!img.succes) {
-                System.out.println("Conversion KO: " + img.message);
+            // 1) Conversion PDF en Image
+            ResultatPdf conversion = pdf.conversionPdfEnImage(pdfB64, dpi);
+            if (!conversion.succes) {
+                System.out.println("Conversion PDF->Image KO: " + conversion.message);
                 return;
             }
-            Files.write(new File(outImgPath).toPath(), Base64.getDecoder().decode(img.nomFichierSortie));
+            byte[] outConversion = Base64.getDecoder().decode(conversion.nomFichierSortie);
+            Files.write(new File(outputPath).toPath(), outConversion);
+            System.out.println("OK. Image ecrite dans: " + outputPath);
 
-            // Extraction texte
-            ResultatPdf txt = pdf.extractionTexte(inB64);
-            if (!txt.succes) {
-                System.out.println("Extraction texte KO: " + txt.message);
+            // 2) Extraction de texte
+            ResultatPdf extraction = pdf.extractionTexte(pdfB64);
+            if (!extraction.succes) {
+                System.out.println("Extraction de texte KO: " + extraction.message);
                 return;
             }
 
-            System.out.println("=== TEXTE EXTRAIT ===");
-            System.out.println(txt.message);
+            System.out.println("OK. Texte extrait du PDF:");
+            System.out.println(extraction.message);
 
-            System.out.println("OK. Image->" + outImgPath);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 }
-

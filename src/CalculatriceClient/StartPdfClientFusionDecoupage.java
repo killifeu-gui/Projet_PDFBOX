@@ -1,4 +1,5 @@
 import CalculatriceApp.*;
+import CalculatriceClient.CorbaClientHelper;
 import org.omg.CORBA.*;
 
 import java.io.File;
@@ -28,19 +29,7 @@ public class StartPdfClientFusionDecoupage {
             // ORB comme dans StartClient.
             ORB orb = ORB.init(args, null);
 
-            // Récupérer l'IOR PdfService via ior.txt
-            String iorPdf = null;
-            java.nio.file.Path p = java.nio.file.Paths.get("c:/RONDOMNUMBER9/TP_Corba/ior.txt");
-            String txt = new String(java.nio.file.Files.readAllBytes(p), java.nio.charset.StandardCharsets.UTF_8);
-            for (String line : txt.split("\\r?\\n")) {
-                if (line.startsWith("IOR_PDF=")) {
-                    iorPdf = line.substring("IOR_PDF=".length()).trim();
-                }
-            }
-            if (iorPdf == null) throw new RuntimeException("IOR_PDF absent dans ior.txt");
-
-            org.omg.CORBA.Object iorObj = orb.string_to_object(iorPdf);
-            PdfService pdf = PdfServiceHelper.narrow(iorObj);
+            PdfService pdf = CorbaClientHelper.getPdfService(orb);
 
             String pdf1B64 = readFileToBase64(pdf1Path);
             String pdf2B64 = readFileToBase64(pdf2Path);
@@ -70,4 +59,3 @@ public class StartPdfClientFusionDecoupage {
         }
     }
 }
-

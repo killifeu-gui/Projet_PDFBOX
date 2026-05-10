@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Tools</title>
+</head>
+<body>
+
+<h1>PDF Tools</h1>
+
+<h2>Fusion de deux PDFs</h2>
+<form id="fusionForm">
+    <label for="pdf1">PDF 1:</label>
+    <input type="file" id="pdf1" accept="application/pdf" required><br><br>
+    <label for="pdf2">PDF 2:</label>
+    <input type="file" id="pdf2" accept="application/pdf" required><br><br>
+    <button type="submit">Fusionner</button>
+</form>
+
+<h2>Découpage de PDF</h2>
+<form id="decoupageForm">
+    <label for="pdfDecoupage">PDF:</label>
+    <input type="file" id="pdfDecoupage" accept="application/pdf" required><br><br>
+    <label for="debut">Page de début:</label>
+    <input type="number" id="debut" min="1" required><br><br>
+    <label for="fin">Page de fin:</label>
+    <input type="number" id="fin" min="1" required><br><br>
+    <button type="submit">Découper</button>
+</form>
+
+<h2>Extraction de page</h2>
+<form id="extractionForm">
+    <label for="pdfExtraction">PDF:</label>
+    <input type="file" id="pdfExtraction" accept="application/pdf" required><br><br>
+    <label for="page">Page à extraire:</label>
+    <input type="number" id="page" min="1" required><br><br>
+    <button type="submit">Extraire</button>
+</form>
+
+<h2>Suppression de page</h2>
+<form id="suppressionForm">
+    <label for="pdfSuppression">PDF:</label>
+    <input type="file" id="pdfSuppression" accept="application/pdf" required><br><br>
+    <label for="debutSuppression">Page de début:</label>
+    <input type="number" id="debutSuppression" min="1" required><br><br>
+    <label for="finSuppression">Page de fin:</label>
+    <input type="number" id="finSuppression" min="1" required><br><br>
+    <button type="submit">Supprimer</button>
+</form>
+
+<h2>Ajout de mot de passe</h2>
+<form id="mdpForm">
+    <label for="pdfMdp">PDF:</label>
+    <input type="file" id="pdfMdp" accept="application/pdf" required><br><br>
+    <label for="password">Mot de passe:</label>
+    <input type="password" id="password" required><br><br>
+    <button type="submit">Ajouter</button>
+</form>
+
+<h2>Conversion PDF en image</h2>
+<form id="conversionForm">
+    <label for="pdfConversion">PDF:</label>
+    <input type="file" id="pdfConversion" accept="application/pdf" required><br><br>
+    <label for="dpi">DPI:</label>
+    <input type="number" id="dpi" min="1" value="150" required><br><br>
+    <button type="submit">Convertir</button>
+</form>
+
+<h2>Extraction de texte</h2>
+<form id="extractionTexteForm">
+    <label for="pdfExtractionTexte">PDF:</label>
+    <input type="file" id="pdfExtractionTexte" accept="application/pdf" required><br><br>
+    <button type="submit">Extraire le texte</button>
+</form>
+<pre id="texteExtrait"></pre>
+
+<h2>Création de PDF</h2>
+<form id="creationForm">
+    <label for="texte">Texte:</label><br>
+    <textarea id="texte" rows="10" cols="50" required></textarea><br><br>
+    <button type="submit">Créer</button>
+</form>
+
+<script>
+    document.getElementById('fusionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pdf1 = await toBase64(document.getElementById('pdf1').files[0]);
+        const pdf2 = await toBase64(document.getElementById('pdf2').files[0]);
+        const response = await fetch('/fusion', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pdf1, pdf2 })
+        });
+        const base64 = await response.text();
+        downloadPdf(base64, 'fusion.pdf');
+    });
+
+    document.getElementById('decoupageForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pdf = await toBase64(document.getElementById('pdfDecoupage').files[0]);
+        const debut = document.getElementById('debut').value;
+        const fin = document.getElementById('fin').value;
+        const response = await fetch('/decoupage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pdf, debut: parseInt(debut), fin: parseInt(fin) })
+        });
+        const base64 = await response.text();
+        downloadPdf(base64, 'decoupage.pdf');
+    });
+
+    document.getElementById('extractionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pdf = await toBase64(document.getElementById('pdfExtraction').files[0]);
+        const page = document.getElementById('page').value;
+        const response = await fetch('/extraction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pdf, page: parseInt(page) })
+        });
+        const base64 = await response.text();
+        downloadPdf(base64, 'extraction.pdf');
+    });
+
+    document.getElementById('suppressionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pdf = await toBase64(document.getElementById('pdfSuppression').files[0]);
+        const debut = document.getElementById('debutSuppression').value;
+        const fin = document.getElementById('finSuppression').value;
+        const response = await fetch('/suppression', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pdf, debut: parseInt(debut), fin: parseInt(fin) })
+        });
+        const base64 = await response.text();
+        downloadPdf(base64, 'suppression.pdf');
+    });
+
+    document.getElementById('mdpForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pdf = await toBase64(document.getElementById('pdfMdp').files[0]);
+        const password = document.getElementById('password').value;
+        const response = await fetch('/ajout-mot-de-passe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pdf, password })
+        });
+        const base64 = await response.text();
+        downloadPdf(base64, 'mdp.pdf');
+    });
+
+    document.getElementById('conversionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pdf = await toBase64(document.getElementById('pdfConversion').files[0]);
+        const dpi = document.getElementById('dpi').value;
+        const response = await fetch('/conversion-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pdf, dpi: parseInt(dpi) })
+        });
+        const base64 = await response.text();
+        downloadImage(base64, 'conversion.png');
+    });
+
+    document.getElementById('extractionTexteForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pdf = await toBase64(document.getElementById('pdfExtractionTexte').files[0]);
+        const response = await fetch('/extraction-texte', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pdf })
+        });
+        const texte = await response.text();
+        document.getElementById('texteExtrait').textContent = texte;
+    });
+
+    document.getElementById('creationForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const texte = document.getElementById('texte').value;
+        const response = await fetch('/creation-pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ texte })
+        });
+        const base64 = await response.text();
+        downloadPdf(base64, 'creation.pdf');
+    });
+
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    function downloadPdf(base64, filename) {
+        const link = document.createElement('a');
+        link.href = 'data:application/pdf;base64,' + base64;
+        link.download = filename;
+        link.click();
+    }
+
+    function downloadImage(base64, filename) {
+        const link = document.createElement('a');
+        link.href = 'data:image/png;base64,' + base64;
+        link.download = filename;
+        link.click();
+    }
+
+</script>
+
+</body>
+</html>

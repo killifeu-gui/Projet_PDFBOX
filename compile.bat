@@ -15,26 +15,35 @@ echo ========================================
 REM Créer le dossier bin s'il n'existe pas
 if not exist bin mkdir bin
 
-echo [1/3] Compilation des fichiers CalculatriceApp...
-"%JAVA_HOME%\bin\javac" -cp %CLASSPATH% -d bin CalculatriceApp\*.java
+echo [1/4] Compilation des fichiers CalculatriceApp...
+"%JAVA_HOME%\bin\javac" -cp %CLASSPATH% -d bin src\CalculatriceApp\*.java
 if errorlevel 1 (
     echo ERREUR: Echec compilation CalculatriceApp
     exit /b 1
 )
 
-echo [2/3] Compilation du serveur...
+echo [2/4] Compilation du serveur...
 "%JAVA_HOME%\bin\javac" -cp %CLASSPATH% -d bin src\CalculatriceServer\*.java
 if errorlevel 1 (
     echo ERREUR: Echec compilation serveur
     exit /b 1
 )
 
-echo [3/3] Compilation des clients...
+echo [3/4] Compilation des clients...
 "%JAVA_HOME%\bin\javac" -cp %CLASSPATH% -d bin src\CalculatriceClient\*.java
 if errorlevel 1 (
     echo ERREUR: Echec compilation clients
     exit /b 1
 )
+
+echo [4/4] Compilation de l'API web...
+cd pdfapi
+call mvnw.cmd clean package
+if errorlevel 1 (
+    echo ERREUR: Echec compilation pdfapi
+    exit /b 1
+)
+cd ..
 
 echo ========================================
 echo Compilation terminee avec succes!
@@ -42,3 +51,6 @@ echo ========================================
 echo.
 echo Fichiers generes dans bin/:
 dir /b bin
+echo.
+echo Fichier JAR de l'API web genere dans pdfapi/target:
+dir /b pdfapi\target\*.jar

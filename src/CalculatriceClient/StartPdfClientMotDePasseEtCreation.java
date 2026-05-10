@@ -1,6 +1,5 @@
 import CalculatriceApp.*;
-import org.omg.CosNaming.*;
-import org.omg.CosNaming.NamingContextPackage.*;
+import CalculatriceClient.CorbaClientHelper;
 import org.omg.CORBA.*;
 
 import java.io.File;
@@ -13,75 +12,54 @@ public class StartPdfClientMotDePasseEtCreation {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
+    private static String readTextFile(String path) throws Exception {
+        return new String(Files.readAllBytes(new File(path).toPath()));
+    }
+
     public static void main(String[] args) {
         try {
-            // args:
-            // [0]=pdf input
-            // [1]=password
-            // [2]=out password.pdf
-            // [3]=texte à mettre dans le pdf créé (simple TP)
-            // [4]=out created.pdf
+            // args[0]=pdf
+            // args[1]=password
+            // args[2]=text file
+            // args[3]=outputPath (pdf)
 
-            String inPath = (args.length > 0 ? args[0] : "input.pdf");
-            String password = (args.length > 1 ? args[1] : "secret123");
-            String outProtected = (args.length > 2 ? args[2] : "output_protected.pdf");
-            String texte = (args.length > 3 ? args[3] : "Bonjour CORBA + PDFBox");
-            String outCreated = (args.length > 4 ? args[4] : "output_created.pdf");
+            String pdfPath = (args.length > 0 ? args[0] : "input1.pdf");
+            String password = (args.length > 1 ? args[1] : "password");
+            String textPath = (args.length > 2 ? args[2] : "input.txt");
+            String outputPath = (args.length > 3 ? args[3] : "output_creation.pdf");
 
+            // ORB comme dans StartClient.
             ORB orb = ORB.init(args, null);
 
-            PdfService pdf = null;
-            try {
-                // 1) Essayer NamingService
-                // CORBA: utiliser le NamingService (mode fiable).
-                org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
-                NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
-                org.omg.CORBA.Object refObj = ncRef.resolve_str("PdfService");
-                pdf = PdfServiceHelper.narrow(refObj);
-            } catch (Exception e) {
-                // 2) Fallback via IOR file
-                try {
-                    java.nio.file.Path p = java.nio.file.Paths.get("c:/RONDOMNUMBER9/TP_Corba/ior.txt");
-                    String txt = new String(java.nio.file.Files.readAllBytes(p), java.nio.charset.StandardCharsets.UTF_8);
-                    String iorPdf = null;
-                    for (String line : txt.split("\\r?\\n")) {
-                        if (line.startsWith("IOR_PDF=")) {
-                            iorPdf = line.substring("IOR_PDF=".length()).trim();
-                        }
-                    }
-                    if (iorPdf == null) throw new RuntimeException("IOR_PDF absent dans ior.txt");
+            PdfService pdf = CorbaClientHelper.getPdfService(orb);
 
-                    org.omg.CORBA.Object iorObj = orb.string_to_object(iorPdf);
-                    pdf = PdfServiceHelper.narrow(iorObj);
-                    System.out.println("[INFO] PdfService récupéré via ior.txt");
-                } catch (Exception e2) {
-                    throw new RuntimeException("Impossible de contacter NamingService et impossible de lire ior.txt", e2);
-                }
-            }
-
-
-
-
-            String inB64 = readFileToBase64(inPath);
-
-            ResultatPdf prot = pdf.ajoutMotDePasse(inB64, password);
-            if (!prot.succes) {
-                System.out.println("Ajout mot de passe KO: " + prot.message);
+            // 1) Ajout mot de passe
+            String pdfB64 = readFileToBase64(pdfPath);
+            ResultatPdf ajoutMdp = pdf.ajoutMotDePasse(pdfB64, password);
+            if (!ajoutMdp.succes) {
+                System.out.println("Ajout mot de passe KO: " + ajoutMdp.message);
                 return;
             }
-            Files.write(new File(outProtected).toPath(), Base64.getDecoder().decode(prot.nomFichierSortie));
+            byte[] outMdp = Base64.getDecoder().decode(ajoutMdp.nomFichierSortie);
+            String outputMdpPath = "output_mdp.pdf";
+            Files.write(new File(outputMdpPath).toPath(), outMdp);
+            System.out.println("OK. PDF avec mot de passe ecrit dans: " + outputMdpPath);
 
-            ResultatPdf created = pdf.creationPdf(texte);
-            if (!created.succes) {
-                System.out.println("Creation PDF KO: " + created.message);
+            // 2) Creation PDF
+            String texte = readTextFile(textPath);
+            ResultatPdf creation = pdf.creationPdf(texte);
+            if (!creation.succes) {
+                System.out.println("Creation PDF KO: " + creation.message);
                 return;
             }
-            Files.write(new File(outCreated).toPath(), Base64.getDecoder().decode(created.nomFichierSortie));
 
-            System.out.println("OK. Prot->" + outProtected + " / Created->" + outCreated);
+            // nomFichierSortie contient le base64 du PDF résultat dans ce TP
+            byte[] outCreation = Base64.getDecoder().decode(creation.nomFichierSortie);
+            Files.write(new File(outputPath).toPath(), outCreation);
+
+            System.out.println("OK. Creation PDF ecrite dans: " + outputPath);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 }
-
