@@ -197,6 +197,8 @@ docker run -p 8080:8080 projet-pdfbox
 
 Le service sera accessible sur `http://localhost:8080`.
 
+Pour des instructions détaillées sur le test Docker local, voir [TEST_DOCKER_LOCAL.md](TEST_DOCKER_LOCAL.md).
+
 ### Déploiement local
 
 1. Compiler : `compile.bat`
@@ -215,24 +217,80 @@ La partie `pdfapi/` fournit une API REST Spring Boot qui encapsule les appels CO
 - `pdfapi/pom.xml` utilise maintenant `org.jacorb:jacorb:3.11.0` comme ORB
 - `pdfapi` compile les sources CORBA générées depuis `../src/CalculatriceApp`
 
-**Étapes :**
-1. Déployer sur Render comme web service en utilisant le `Dockerfile` racine
-2. Configurer les variables d'environnement :
-   - `ORB_INITIAL_HOST` : IP du serveur CORBA
-   - `ORB_INITIAL_PORT` : 1050
+**Configuration Render - Étapes manuelles :**
+
+1. **Connectez votre dépôt GitHub**
+   - Allez sur https://dashboard.render.com/
+   - Cliquez sur **+ New** → **Web Service**
+   - Connectez votre repo GitHub `killifeu-gui/Project_PDFBOX`
+
+2. **Configurez le build Docker**
+   - **Build Command** (laisser vide, Render détectera le `Dockerfile`)
+   - **Start Command** (laisser vide, le `ENTRYPOINT` du Dockerfile s'exécutera)
+   - **Root Directory** : `/` (racine du repo)
+
+3. **Variables d'environnement (Settings → Environment)**
+   - `ORB_INITIAL_HOST` = `votre-ip-corba.com` (ou localhost si CORBA est sur Render aussi)
+   - `ORB_INITIAL_PORT` = `1050`
+   - `PORT` = `8080` (déjà défini par Spring Boot)
+
+4. **Déploiement**
+   - Plan : Free (suffisant pour tests)
+   - Région : Oregon (ou la plus proche)
+   - Auto-deploy : Oui (déploie à chaque push sur `main`)
+
+5. **Déploiement automatique GitHub**
+   ```bash
+   git add .
+   git commit -m "Setup Render deployment"
+   git push origin main
+   ```
+   → Render détectera le push et déploiera automatiquement
+
+**Configuration alternative avec `render.yaml` (optionnel)**
+
+Un fichier `render.yaml` a été ajouté à la racine. Vous pouvez le modifier pour ajuster la configuration.
 
 **Exemple d'utilisation API :**
 ```bash
-curl -X POST http://your-render-app.com/fusion \
+curl -X POST https://your-render-app.onrender.com/fusion \
   -H "Content-Type: application/json" \
-  -d '{"pdf1":"base64...", "pdf2":"base64..."}'
+  -d '{"pdf1":"base64_encoded_pdf1", "pdf2":"base64_encoded_pdf2"}'
 ```
 
-#### Option 2 : Serveur CORBA complet
+#### Option 2 : Serveur CORBA complet sur Render (expérimental)
 
-- Déployer comme "Background Worker" sur Render
+- Render supporte les **Background Workers**, mais pas les services ORB persistants
 - Nécessite un port statique et connexion persistante
-- Moins adapté aux environnements cloud éphémères
+- Non recommandé pour production
+
+#### Dépannage Render
+
+Si le déploiement échoue :
+
+1. **Vérifiez les logs Render**
+   - Dashboard → Votre service → Logs
+   - Cherchez les erreurs Maven ou Docker
+
+2. **Si `ORB_INITIAL_HOST` est inaccessible**
+   - Render ne peut pas atteindre votre serveur CORBA local
+   - Solution : Hébergez aussi le serveur CORBA sur Render ou exposez le vôtre avec un tunnel
+
+3. **Erreur de Java version**
+   - Le Dockerfile utilise Java 17 pour runtime et Maven 3.9.9
+   - Si vous avez besoin de Java 1.8, modifiez le `Dockerfile`
+
+---
+
+## 📚 Guides de déploiement complets
+
+- **[DEPLOIEMENT_RENDER.md](DEPLOIEMENT_RENDER.md)** - Guide complet Render (étapes manuelles)
+- **[TEST_DOCKER_LOCAL.md](TEST_DOCKER_LOCAL.md)** - Test Docker localement avant déploiement
+- **[CHECKLIST_DEPLOIEMENT.md](CHECKLIST_DEPLOIEMENT.md)** - Checklist et architecture finale
+
+Recommandé : Commencez par [TEST_DOCKER_LOCAL.md](TEST_DOCKER_LOCAL.md), puis suivez [DEPLOIEMENT_RENDER.md](DEPLOIEMENT_RENDER.md).
+
+---
 
 ## Fonctionnalité Web
 

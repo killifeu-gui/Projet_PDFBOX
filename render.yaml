@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: projet-pdfbox
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ORB_INITIAL_HOST
+        value: localhost
+        scope: build
+      - key: ORB_INITIAL_PORT
+        value: "1050"
+        scope: build
+      - key: PORT
+        value: "8080"
+        scope: build
+    plan: free
+    region: oregon
+    autoDeploy: true
