@@ -1,0 +1,8 @@
+target
+bin
+pdfapi/target
+*.log
+*.tmp
+.git
+.gitignore
+.DS_Store

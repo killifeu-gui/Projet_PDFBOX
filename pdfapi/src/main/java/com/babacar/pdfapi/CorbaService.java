@@ -20,8 +20,10 @@ public class CorbaService {
     public CorbaService() {
         try {
             Properties props = new Properties();
-            props.put("org.omg.CORBA.ORBInitialPort", "1050");
-            props.put("org.omg.CORBA.ORBInitialHost", "localhost");
+            String host = System.getenv().getOrDefault("ORB_INITIAL_HOST", "localhost");
+            String port = System.getenv().getOrDefault("ORB_INITIAL_PORT", "1050");
+            props.put("org.omg.CORBA.ORBInitialHost", host);
+            props.put("org.omg.CORBA.ORBInitialPort", port);
             ORB orb = ORB.init(new String[0], props);
 
             org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");

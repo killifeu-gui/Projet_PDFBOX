@@ -37,7 +37,9 @@ public class PdfController {
         int debut = (int) payload.get("debut");
         int fin = (int) payload.get("fin");
 
-        PlagePages plage = new PlagePages(debut, fin);
+        PlagePages plage = new PlagePages();
+        plage.debut = debut;
+        plage.fin = fin;
         ResultatPdf resultat = corbaService.getPdfService().decoupagePdf(pdfBase64, plage);
 
         if (resultat.succes) {
@@ -52,7 +54,9 @@ public class PdfController {
         String pdfBase64 = (String) payload.get("pdf");
         int page = (int) payload.get("page");
 
-        PlagePages plage = new PlagePages(page, page);
+        PlagePages plage = new PlagePages();
+        plage.debut = page;
+        plage.fin = page;
         ResultatPdf resultat = corbaService.getPdfService().extractionPage(pdfBase64, plage);
 
         if (resultat.succes) {
@@ -68,7 +72,9 @@ public class PdfController {
         int debut = (int) payload.get("debut");
         int fin = (int) payload.get("fin");
 
-        PlagePages plage = new PlagePages(debut, fin);
+        PlagePages plage = new PlagePages();
+        plage.debut = debut;
+        plage.fin = fin;
         ResultatPdf resultat = corbaService.getPdfService().suppressionPage(pdfBase64, plage);
 
         if (resultat.succes) {

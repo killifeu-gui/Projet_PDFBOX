@@ -183,6 +183,20 @@ Si le NamingService n'est pas disponible, les clients peuvent utiliser le fichie
 
 ## Déploiement
 
+### Déploiement avec Docker
+
+Un `Dockerfile` a été ajouté à la racine du projet pour construire et déployer l'API Spring Boot située dans `pdfapi/`.
+
+```bash
+# Construire l'image Docker
+docker build -t projet-pdfbox .
+
+# Lancer le conteneur
+docker run -p 8080:8080 projet-pdfbox
+```
+
+Le service sera accessible sur `http://localhost:8080`.
+
 ### Déploiement local
 
 1. Compiler : `compile.bat`
@@ -197,10 +211,13 @@ Si le NamingService n'est pas disponible, les clients peuvent utiliser le fichie
 
 La partie `pdfapi/` fournit une API REST Spring Boot qui encapsule les appels CORBA.
 
+**Ce qui a été corrigé :**
+- `pdfapi/pom.xml` utilise maintenant `org.jacorb:jacorb:3.11.0` comme ORB
+- `pdfapi` compile les sources CORBA générées depuis `../src/CalculatriceApp`
+
 **Étapes :**
-1. Corriger les dépendances dans `pdfapi/pom.xml` (remplacer `org.glassfish.corba:omgapi:jar:4.2.0` par une version disponible)
-2. Déployer sur Render comme web service
-3. Configurer les variables d'environnement :
+1. Déployer sur Render comme web service en utilisant le `Dockerfile` racine
+2. Configurer les variables d'environnement :
    - `ORB_INITIAL_HOST` : IP du serveur CORBA
    - `ORB_INITIAL_PORT` : 1050
 
