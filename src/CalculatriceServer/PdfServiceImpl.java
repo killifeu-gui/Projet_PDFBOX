@@ -23,6 +23,9 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+
 /**
  * Implémentation CORBA du service PDF.
  * Entrées/sorties : base64 (String)
@@ -250,11 +253,16 @@ public class PdfServiceImpl extends PdfServicePOA
         try
         {
             PDDocument doc = new PDDocument();
-            // création minimaliste : PDFBox 1.8 nécessite PDPage + PDPageContentStream.
-            // Pour rester en TP, on crée un document vide si nécessaire.
-            // (Tu peux ensuite enrichir avec un vrai rendu de texte si tu as les polices.)
             PDPage page = new PDPage();
             doc.addPage(page);
+
+            PDPageContentStream contentStream = new PDPageContentStream(doc, page);
+            contentStream.setFont(PDType1Font.HELVETICA, 12);
+            contentStream.beginText();
+            contentStream.newLineAtOffset(25, 750);
+            contentStream.showText(texte != null ? texte : "");
+            contentStream.endText();
+            contentStream.close();
 
             byte[] out;
             try

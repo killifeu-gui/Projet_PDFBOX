@@ -1,5 +1,6 @@
+package CalculatriceClient;
+
 import CalculatriceApp.*;
-import CalculatriceClient.CorbaClientHelper;
 import org.omg.CORBA.*;
 
 import java.io.File;
@@ -46,8 +47,10 @@ public class StartPdfClientExtractionSuppression {
 
 
             // 2) Suppression
-            PlagePages plageSuppression = new PlagePages(startPageToDelete, endPageToDelete);
-            ResultatPdf suppression = pdf.suppressionPage(pdfB64, plageSuppression);
+            PlagePages plage = new PlagePages();
+            plage.debut = startPageToDelete;
+            plage.fin = endPageToDelete;
+            ResultatPdf suppression = pdf.suppressionPage(pdfB64, plage);
             if (!suppression.succes) {
                 System.out.println("Suppression KO: " + suppression.message);
                 return;

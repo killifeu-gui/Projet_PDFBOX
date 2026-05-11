@@ -104,9 +104,160 @@ java -cp bin;lib/pdfbox-2.0.29.jar;lib/commons-logging-1.2.jar StartPdfClientMot
 java -cp bin;lib/pdfbox-2.0.29.jar;lib/commons-logging-1.2.jar StartPdfClientConversionEtTexte input.pdf output.png 150
 ```
 
+#### Nouveaux clients individuels (ajoutés récemment)
+
+**Fusion de PDFs :**
+```batch
+run_client_fusion.bat pdf1.pdf pdf2.pdf output.pdf
+```
+
+**Découpage de PDF :**
+```batch
+run_client_decoupage.bat pdf.pdf debut fin output.pdf
+```
+
+**Extraction de page :**
+```batch
+run_client_extraction.bat pdf.pdf page output.pdf
+```
+
+**Suppression de pages :**
+```batch
+run_client_suppression.bat pdf.pdf debut fin output.pdf
+```
+
+## Tests complets
+
+### Préparation des fichiers de test
+
+```batch
+REM Créer un fichier texte
+echo "Ceci est un PDF de test avec du texte." > test.txt
+
+REM Créer un PDF vide (nécessite PDFBox)
+javac -cp 'lib/pdfbox-2.0.29.jar;lib/commons-logging-1.2.jar' CreatePDF.java
+java -cp '.;lib/pdfbox-2.0.29.jar;lib/commons-logging-1.2.jar' CreatePDF
+
+REM Créer un PDF multi-pages
+javac -cp 'lib/pdfbox-2.0.29.jar;lib/commons-logging-1.2.jar' AddPage.java
+java -cp '.;lib/pdfbox-2.0.29.jar;lib/commons-logging-1.2.jar' AddPage
+```
+
+### Démarrage du serveur
+
+```batch
+run_server.bat
+```
+
+### Tests des opérations PDF
+
+```batch
+REM Fusion
+run_client_fusion.bat dummy.pdf test2.pdf fusion_result.pdf
+
+REM Découpage (pages 1 à 1)
+run_client_decoupage.bat multi_page.pdf 1 1 decoupage_result.pdf
+
+REM Extraction page 2
+run_client_extraction.bat multi_page.pdf 2 extraction_result.pdf
+
+REM Suppression page 1
+run_client_suppression.bat multi_page.pdf 1 1 suppression_result.pdf
+
+REM Clients combinés existants
+java -cp 'bin;lib/pdfbox-2.0.29.jar;lib/commons-logging-1.2.jar' CalculatriceClient.StartPdfClientFusionDecoupage dummy.pdf test2.pdf result.pdf 1 2
+java -cp 'bin;lib/pdfbox-2.0.29.jar;lib/commons-logging-1.2.jar' CalculatriceClient.StartPdfClientExtractionSuppression multi_page.pdf extracted.pdf suppressed.pdf 1 2 2
+java -cp 'bin;lib/pdfbox-2.0.29.jar;lib/commons-logging-1.2.jar' CalculatriceClient.StartPdfClientMotDePasseEtCreation dummy.pdf password test.txt protected.pdf
+java -cp 'bin;lib/pdfbox-2.0.29.jar;lib/commons-logging-1.2.jar' CalculatriceClient.StartPdfClientConversionEtTexte multi_page.pdf image.png 150
+```
+
+### Test de la calculatrice
+
+```batch
+java -cp 'bin;lib/pdfbox-2.0.29.jar;lib/commons-logging-1.2.jar' CalculatriceClient.StartClient
+```
+
 ## Mode sans NamingService
 
 Si le NamingService n'est pas disponible, les clients peuvent utiliser le fichier `ior.txt` généré automatiquement.
+
+## Déploiement
+
+### Déploiement local
+
+1. Compiler : `compile.bat`
+2. Démarrer le serveur : `run_server.bat`
+3. Lancer les clients selon les besoins
+
+### Déploiement avec Render
+
+**Limitations :** CORBA nécessite un serveur ORB persistant avec port fixe, ce qui n'est pas idéal pour les plateformes cloud comme Render. Cependant, vous pouvez déployer la partie web API.
+
+#### Option 1 : API Web uniquement (recommandé pour cloud)
+
+La partie `pdfapi/` fournit une API REST Spring Boot qui encapsule les appels CORBA.
+
+**Étapes :**
+1. Corriger les dépendances dans `pdfapi/pom.xml` (remplacer `org.glassfish.corba:omgapi:jar:4.2.0` par une version disponible)
+2. Déployer sur Render comme web service
+3. Configurer les variables d'environnement :
+   - `ORB_INITIAL_HOST` : IP du serveur CORBA
+   - `ORB_INITIAL_PORT` : 1050
+
+**Exemple d'utilisation API :**
+```bash
+curl -X POST http://your-render-app.com/fusion \
+  -H "Content-Type: application/json" \
+  -d '{"pdf1":"base64...", "pdf2":"base64..."}'
+```
+
+#### Option 2 : Serveur CORBA complet
+
+- Déployer comme "Background Worker" sur Render
+- Nécessite un port statique et connexion persistante
+- Moins adapté aux environnements cloud éphémères
+
+## Fonctionnalité Web
+
+**Oui, l'application est fonctionnelle sous format web via l'API REST.**
+
+- **Endpoint** : `pdfapi/` (Spring Boot)
+- **Port par défaut** : 8080
+- **Routes disponibles** :
+  - `POST /fusion` - Fusion de PDFs
+  - `POST /decoupage` - Découpage de PDF
+  - `POST /extraction` - Extraction de page
+  - `POST /suppression` - Suppression de pages
+  - `POST /ajout-mot-de-passe` - Ajout mot de passe
+  - `POST /conversion-image` - Conversion en image
+  - `POST /extraction-texte` - Extraction de texte
+  - `POST /creation-pdf` - Création de PDF
+
+**État actuel :** L'API compile avec des warnings mais fonctionne. Les dépendances CORBA peuvent nécessiter des ajustements pour le déploiement cloud.
+
+## Architecture
+
+```
+┌─────────────────┐     CORBA/IIOP     ┌─────────────────┐     ┌─────────────────┐
+│   Clients CLI   │◄──────────────────►│   Serveur CORBA │◄───►│   API Web       │
+│                 │                    │                 │     │   (Spring)      │
+│ - Calculatrice  │                    │ - Calculatrice  │     │                 │
+│ - PDF (8 ops)   │                    │ - PdfService    │     │ - Endpoints REST │
+└─────────────────┘                    └─────────────────┘     └─────────────────┘
+                                                │
+                                                ▼
+                                       ┌─────────────────┐
+                                       │    PDFBox       │
+                                       │   2.0.29        │
+                                       └─────────────────┘
+```
+
+## Notes
+
+- Les PDFs sont transmis en base64 via CORBA
+- Le serveur enregistre les IOR dans `ior.txt` pour fallback
+- PDFBox 2.0.29 est utilisé (compatible Java 1.8)
+- L'API web permet l'intégration avec des applications modernes
 
 ## Architecture
 

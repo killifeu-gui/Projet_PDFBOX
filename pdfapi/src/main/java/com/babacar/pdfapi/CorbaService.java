@@ -1,6 +1,7 @@
 package com.babacar.pdfapi;
 
-import CalculatriceApp.*;
+import CalculatriceApp.PdfService;
+import CalculatriceApp.PdfServiceHelper;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CosNaming.NamingContextExt;

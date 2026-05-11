@@ -6,7 +6,7 @@ set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_202
 set PDFBOX_JAR=lib\pdfbox-2.0.29.jar
 set FONTBOX_JAR=lib\fontbox-2.0.29.jar
 set COMMONS_LOGGING_JAR=lib\commons-logging-1.2.jar
-set CLASSPATH=%PDFBOX_JAR%;%FONTBOX_JAR%;%COMMONS_LOGGING_JAR%;.
+set CLASSPATH=bin;%PDFBOX_JAR%;%FONTBOX_JAR%;%COMMONS_LOGGING_JAR%;.
 
 echo ========================================
 echo Compilation du projet TP_Corba

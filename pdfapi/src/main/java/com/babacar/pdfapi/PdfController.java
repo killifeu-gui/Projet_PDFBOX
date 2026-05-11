@@ -1,7 +1,7 @@
 package com.babacar.pdfapi;
 
-import PlagePages;
-import ResultatPdf;
+import CalculatriceApp.PlagePages;
+import CalculatriceApp.ResultatPdf;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;

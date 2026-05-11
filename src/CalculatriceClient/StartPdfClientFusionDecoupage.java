@@ -1,5 +1,6 @@
+package CalculatriceClient;
+
 import CalculatriceApp.*;
-import CalculatriceClient.CorbaClientHelper;
 import org.omg.CORBA.*;
 
 import java.io.File;

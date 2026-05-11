@@ -51,7 +51,7 @@ public class CalculatriceImpl extends CalculatricePOA
         return numerateur / denominateur;
     }
 
-    // ✅ CORRECTION CORBA : int et pas long
+    // ✅ CORRECTION CORBA : int (CORBA long = Java int)
     @Override
     public int modulo(int dividende, int diviseur) 
         throws DivisionParZeroException 
