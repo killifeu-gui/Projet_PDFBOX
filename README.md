@@ -284,11 +284,12 @@ Si le déploiement échoue :
 
 ## 📚 Guides de déploiement complets
 
+- **[AUTHENTIFICATION_JWT.md](AUTHENTIFICATION_JWT.md)** - Guide complet de l'authentification JWT (nouveau)
 - **[DEPLOIEMENT_RENDER.md](DEPLOIEMENT_RENDER.md)** - Guide complet Render (étapes manuelles)
 - **[TEST_DOCKER_LOCAL.md](TEST_DOCKER_LOCAL.md)** - Test Docker localement avant déploiement
 - **[CHECKLIST_DEPLOIEMENT.md](CHECKLIST_DEPLOIEMENT.md)** - Checklist et architecture finale
 
-Recommandé : Commencez par [TEST_DOCKER_LOCAL.md](TEST_DOCKER_LOCAL.md), puis suivez [DEPLOIEMENT_RENDER.md](DEPLOIEMENT_RENDER.md).
+Recommandé : Commencez par [AUTHENTIFICATION_JWT.md](AUTHENTIFICATION_JWT.md) pour comprendre l'auth, puis [TEST_DOCKER_LOCAL.md](TEST_DOCKER_LOCAL.md), puis [DEPLOIEMENT_RENDER.md](DEPLOIEMENT_RENDER.md).
 
 ---
 
@@ -298,6 +299,73 @@ Recommandé : Commencez par [TEST_DOCKER_LOCAL.md](TEST_DOCKER_LOCAL.md), puis s
 
 - **Endpoint** : `pdfapi/` (Spring Boot)
 - **Port par défaut** : 8080
+
+### 🔐 Authentification JWT (NOUVEAU)
+
+**Tous les utilisateurs doivent s'identifier avant d'accéder aux endpoints PDF.**
+
+#### Enregistrement et connexion
+
+```bash
+# 1. S'enregistrer
+curl -X POST http://localhost:8080/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "john_doe",
+    "password": "SecurePassword123",
+    "email": "john@example.com"
+  }'
+
+# Réponse : reçoit un TOKEN JWT
+
+# 2. Se connecter (si compte existant)
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "john_doe",
+    "password": "SecurePassword123"
+  }'
+
+# Réponse : reçoit un TOKEN JWT
+```
+
+#### Utiliser le token pour accéder aux PDFs
+
+```bash
+# Chaque requête doit inclure le header Authorization avec le token
+
+curl -X POST http://localhost:8080/creation-pdf \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"texte":"Mon PDF créé"}'
+
+# Tous les endpoints PDF nécessitent ce header :
+# /fusion, /decoupage, /extraction, /suppression, 
+# /ajout-mot-de-passe, /conversion-image, /extraction-texte
+```
+
+#### Endpoints d'authentification
+
+```
+✅ Publics (sans token) :
+   POST /auth/register    → Créer un compte
+   POST /auth/login       → Se connecter
+   GET  /health           → Santé de l'API
+
+🔒 Protégés (avec token JWT) :
+   POST /fusion
+   POST /decoupage
+   POST /extraction
+   POST /suppression
+   POST /ajout-mot-de-passe
+   POST /conversion-image
+   POST /extraction-texte
+   POST /creation-pdf
+```
+
+**📖 Documentation complète:** Voir [AUTHENTIFICATION_JWT.md](AUTHENTIFICATION_JWT.md)
+
+---
 - **Routes disponibles** :
   - `POST /fusion` - Fusion de PDFs
   - `POST /decoupage` - Découpage de PDF

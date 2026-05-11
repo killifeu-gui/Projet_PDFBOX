@@ -41,6 +41,19 @@
 - ✅ Base64 transmission CORBA vérifiée
 - ✅ Compilations sans erreur
 
+### 6. **🔐 Authentification JWT (NOUVEAU)**
+- ✅ Spring Security configuré
+- ✅ User.java - Entité d'utilisateur JPA
+- ✅ RegisterRequest.java, LoginRequest.java, AuthResponse.java - DTOs
+- ✅ JwtProvider.java - Génération/validation de tokens JWT
+- ✅ JwtFilter.java - Filtre d'authentification
+- ✅ UserService.java + UserRepository.java - Gestion des utilisateurs
+- ✅ SecurityConfig.java - Configuration Spring Security
+- ✅ AuthController.java - Endpoints /auth/register et /auth/login
+- ✅ PdfController.java - Tous les endpoints protégés avec @PreAuthorize
+- ✅ application.properties - Configuration JWT et base H2
+- ✅ Documentation : AUTHENTIFICATION_JWT.md
+
 ---
 
 ## 📊 État du projet
@@ -132,24 +145,91 @@ Tous les PDFs en **Base64**.
 
 ---
 
+## 🔐 Nouveaux endpoints d'authentification
+
+### S'enregistrer
+```
+POST /auth/register
+{
+  "username": "john_doe",
+  "password": "SecurePassword123",
+  "email": "john@example.com"
+}
+```
+
+**Réponse:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "username": "john_doe",
+  "email": "john@example.com",
+  "success": true
+}
+```
+
+### Se connecter
+```
+POST /auth/login
+{
+  "username": "john_doe",
+  "password": "SecurePassword123"
+}
+```
+
+**Réponse:** (même format)
+
+### Utiliser les endpoints PDF
+```
+POST /creation-pdf
+Headers:
+  Authorization: Bearer <TOKEN_JWT>
+Body:
+  {"texte":"Mon contenu"}
+```
+
+⚠️ **Sans le token → Erreur 401 Unauthorized**
+
+📖 **Guide complet:** [AUTHENTIFICATION_JWT.md](AUTHENTIFICATION_JWT.md)
+
+---
+
 ## 📋 Prochaines étapes
 
 ### Immédiat (< 5 min)
-- [ ] `git push` vers GitHub
+- [ ] Compiler le projet avec Maven: `mvn clean package` (depuis pdfapi/)
+- [ ] `git add .` et `git commit` et `git push` vers GitHub
 - [ ] Créer le service Render
 - [ ] Configurer les env vars CORBA
 - [ ] Attendre le déploiement
 
+### Tester l'authentification localement
+```bash
+# 1. S'enregistrer
+curl -X POST http://localhost:8080/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"alice","password":"Pass123","email":"alice@example.com"}'
+
+# 2. Reçoit un token JWT → le copier
+
+# 3. Utiliser le token pour créer un PDF
+curl -X POST http://localhost:8080/creation-pdf \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN_ICI>" \
+  -d '{"texte":"Test authentification"}'
+```
+
 ### Court terme (1-2 jours)
-- [ ] Tester l'API depuis Render
+- [ ] Tester l'authentification JWT localement
+- [ ] Tester l'API depuis Render avec le token
 - [ ] Valider l'intégration avec le serveur CORBA
 - [ ] Monitorer les logs Render
 
 ### Long terme (optionnel)
 - [ ] Héberger aussi le serveur CORBA sur Render
-- [ ] Ajouter une UI frontend React/Vue
+- [ ] Ajouter une UI frontend React/Vue avec login
 - [ ] Mettre à jour vers le plan Paid Render ($7/mois)
 - [ ] Configurer un domaine personnalisé
+- [ ] Remplacer H2 par PostgreSQL pour persistance
 
 ---
 

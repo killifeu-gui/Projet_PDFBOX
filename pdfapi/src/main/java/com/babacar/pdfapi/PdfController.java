@@ -2,6 +2,7 @@ package com.babacar.pdfapi;
 
 import CalculatriceApp.PlagePages;
 import CalculatriceApp.ResultatPdf;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,7 @@ public class PdfController {
         this.corbaService = corbaService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/fusion")
     public String fusion(@RequestBody Map<String, String> payload) {
         String pdf1Base64 = payload.get("pdf1");
@@ -31,6 +33,7 @@ public class PdfController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/decoupage")
     public String decoupage(@RequestBody Map<String, Object> payload) {
         String pdfBase64 = (String) payload.get("pdf");
@@ -49,6 +52,7 @@ public class PdfController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/extraction")
     public String extraction(@RequestBody Map<String, Object> payload) {
         String pdfBase64 = (String) payload.get("pdf");
@@ -66,6 +70,7 @@ public class PdfController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/suppression")
     public String suppression(@RequestBody Map<String, Object> payload) {
         String pdfBase64 = (String) payload.get("pdf");
@@ -84,6 +89,7 @@ public class PdfController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/ajout-mot-de-passe")
     public String ajoutMotDePasse(@RequestBody Map<String, String> payload) {
         String pdfBase64 = payload.get("pdf");
@@ -98,6 +104,7 @@ public class PdfController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/conversion-image")
     public String conversionImage(@RequestBody Map<String, Object> payload) {
         String pdfBase64 = (String) payload.get("pdf");
@@ -112,6 +119,7 @@ public class PdfController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/extraction-texte")
     public String extractionTexte(@RequestBody Map<String, String> payload) {
         String pdfBase64 = payload.get("pdf");
@@ -125,6 +133,7 @@ public class PdfController {
         }
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/creation-pdf")
     public String creationPdf(@RequestBody Map<String, String> payload) {
         String texte = payload.get("texte");
