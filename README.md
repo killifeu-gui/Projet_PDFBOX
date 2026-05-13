@@ -214,7 +214,7 @@ Pour des instructions détaillées sur le test Docker local, voir [TEST_DOCKER_L
 La partie `pdfapi/` fournit une API REST Spring Boot qui encapsule les appels CORBA.
 
 **Ce qui a été corrigé :**
-- `pdfapi/pom.xml` utilise maintenant `org.jacorb:jacorb:3.11.0` comme ORB
+- `pdfapi/pom.xml` utilise maintenant `org.glassfish.corba:glassfish-corba-omgapi` et `org.glassfish.corba:glassfish-corba-orb` comme ORB
 - `pdfapi` compile les sources CORBA générées depuis `../src/CalculatriceApp`
 
 **Configuration Render - Étapes manuelles :**

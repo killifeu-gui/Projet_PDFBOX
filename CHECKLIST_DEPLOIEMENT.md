@@ -17,7 +17,7 @@
 
 | Fichier | Rôle | Changements |
 |---------|------|------------|
-| `pom.xml` | Build Maven | ✅ JacORB 3.11.0, build-helper-plugin |
+| `pom.xml` | Build Maven | ✅ GlassFish CORBA (`glassfish-corba-omgapi`, `glassfish-corba-orb`), build-helper-plugin |
 | `src/main/java/.../CorbaService.java` | Connexion CORBA | ✅ Env vars ORB_INITIAL_HOST/PORT |
 | `src/main/java/.../PdfController.java` | API REST | ✅ PlagePages via fields |
 
@@ -33,7 +33,7 @@ Project_PDFBOX/
 ├── README.md                 ← Mis à jour
 │
 ├── pdfapi/
-│   ├── pom.xml              ← JacORB + build-helper
+│   ├── pom.xml              ← GlassFish CORBA + build-helper
 │   ├── mvnw / .mvn
 │   ├── src/main/
 │   │   └── java/com/babacar/pdfapi/
@@ -86,7 +86,7 @@ git push origin main
 ## 📋 Checklist avant déploiement
 
 - [ ] `Dockerfile` est à la racine du repo
-- [ ] `pdfapi/pom.xml` contient `org.jacorb:jacorb:3.11.0`
+- [ ] `pdfapi/pom.xml` contient `org.glassfish.corba:glassfish-corba-omgapi` et `org.glassfish.corba:glassfish-corba-orb`
 - [ ] `src/CalculatriceApp/*.java` sont présents (stubs CORBA)
 - [ ] `CorbaService.java` utilise les env vars `ORB_INITIAL_HOST` et `ORB_INITIAL_PORT`
 - [ ] `PdfController.java` crée `PlagePages` sans constructeur

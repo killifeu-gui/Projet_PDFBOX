@@ -63,7 +63,7 @@ public interface CalculatriceOperations
   /**
      * Calcule la puissance (base ^ exposant)
      * @param base La base
-     * @param exposant L'exposant (doit Ãªtre â0¥ 0)
+     * @param exposant L'exposant (doit etre >= 0)
      * @return base ^ exposant
      */
   double power (double base, int exposant);

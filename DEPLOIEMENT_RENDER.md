@@ -20,7 +20,7 @@ git push origin main
 Vérifiez que les fichiers suivants sont présents dans le repo :
 - ✅ `Dockerfile` (racine)
 - ✅ `.dockerignore` (racine)
-- ✅ `pdfapi/pom.xml` (avec JacORB)
+- ✅ `pdfapi/pom.xml` (avec GlassFish CORBA)
 - ✅ `pdfapi/mvnw` (wrapper Maven)
 - ✅ `pdfapi/.mvn/wrapper/maven-wrapper.properties`
 - ✅ `src/CalculatriceApp/*.java` (stubs CORBA)
@@ -114,7 +114,7 @@ Render redéploiera automatiquement en 2-5 minutes.
 - ✅ Vérifiez que `Dockerfile` existe à la racine
 - ✅ Vérifiez le chemin des fichiers copyés dans le Dockerfile
 
-### Erreur : "Cannot resolve org.jacorb"
+### Erreur : "Cannot resolve org.glassfish.corba"
 - Maven n'a pas accès aux dépendances
 - Vérifiez votre connexion Internet dans le build Docker
 - Vérifiez que le repo central Maven est accessible

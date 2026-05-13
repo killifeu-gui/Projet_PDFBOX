@@ -10,7 +10,7 @@ package CalculatriceApp;
 
 
 /**
-   * �0numération des opérations disponibles
+   * Enumeration des operations disponibles
    */
 public class TypeOperation implements org.omg.CORBA.portable.IDLEntity
 {

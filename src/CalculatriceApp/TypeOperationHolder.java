@@ -9,7 +9,7 @@ package CalculatriceApp;
 
 
 /**
-   * �0numération des opérations disponibles
+   * Enumeration des operations disponibles
    */
 public final class TypeOperationHolder implements org.omg.CORBA.portable.Streamable
 {

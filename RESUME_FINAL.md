@@ -14,7 +14,7 @@
 - ✅ Classpath corrigé dans `compile.bat`
 
 ### 2. **API Web Spring Boot (pdfapi)**
-- ✅ `pom.xml` mis à jour avec `org.jacorb:jacorb:3.11.0`
+- ✅ `pom.xml` mis à jour avec `org.glassfish.corba:glassfish-corba-omgapi` et `org.glassfish.corba:glassfish-corba-orb`
 - ✅ Dépendances JAX-WS inutiles supprimées
 - ✅ Plugin Maven pour sources CORBA externes ajouté
 - ✅ `CorbaService.java` utilise variables d'environnement (`ORB_INITIAL_HOST`, `ORB_INITIAL_PORT`)
@@ -245,7 +245,7 @@ curl -X POST http://localhost:8080/creation-pdf \
 ├── TEST_DOCKER_LOCAL.md       ← Test Docker local
 ├── CHECKLIST_DEPLOIEMENT.md   ← Vérification finale
 ├── README.md                  ← Mis à jour
-├── pdfapi/pom.xml             ← JacORB configuré
+├── pdfapi/pom.xml             ← GlassFish CORBA configuré
 ├── src/CalculatriceApp/       ← Stubs CORBA
 └── ... (clients, serveur, etc.)
 ```

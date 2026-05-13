@@ -170,7 +170,7 @@ public class _CalculatriceStub extends org.omg.CORBA.portable.ObjectImpl impleme
   /**
      * Calcule la puissance (base ^ exposant)
      * @param base La base
-     * @param exposant L'exposant (doit Ãªtre â0¥ 0)
+     * @param exposant L'exposant (doit etre >= 0)
      * @return base ^ exposant
      */
   public double power (double base, int exposant)

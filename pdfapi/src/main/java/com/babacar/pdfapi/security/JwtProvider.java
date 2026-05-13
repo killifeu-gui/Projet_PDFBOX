@@ -1,7 +1,6 @@
 package com.babacar.pdfapi.security;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -24,13 +23,11 @@ public class JwtProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-
         return Jwts.builder()
-                .subject(username)
-                .issuedAt(now)
-                .expiration(expiryDate)
-                .signWith(key)
+                .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
     }
 
@@ -38,34 +35,27 @@ public class JwtProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-
         return Jwts.builder()
-                .subject(username)
-                .issuedAt(now)
-                .expiration(expiryDate)
-                .signWith(key)
+                .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
     }
 
     public String getUsernameFromToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
+
+        return claims.getSubject();
     }
 
     public boolean validateToken(String token) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
+            Jwts.parser()
+                    .setSigningKey(jwtSecret)
                     .parseClaimsJws(token);
 
             return true;

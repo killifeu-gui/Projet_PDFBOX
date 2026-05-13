@@ -153,7 +153,7 @@ public abstract class CalculatricePOA extends org.omg.PortableServer.Servant
   /**
      * Calcule la puissance (base ^ exposant)
      * @param base La base
-     * @param exposant L'exposant (doit Ãªtre â0¥ 0)
+     * @param exposant L'exposant (doit etre >= 0)
      * @return base ^ exposant
      */
        case 5:  // CalculatriceApp/Calculatrice/power
