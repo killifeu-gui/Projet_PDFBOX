@@ -1,21 +1,20 @@
 # Multi-stage build pour l'API Spring Boot dans pdfapi/
-FROM maven:3.9.9-amazoncorretto-17 AS build
+FROM maven:3.8.1-openjdk-8 AS build
 
 WORKDIR /app
 
-# Copier le wrapper Maven et le projet Spring Boot
-COPY pdfapi/pom.xml ./pdfapi/
-COPY pdfapi/mvnw ./pdfapi/
-COPY pdfapi/.mvn ./pdfapi/.mvn
-COPY pdfapi/src ./pdfapi/src
-COPY src/CalculatriceApp ./src/CalculatriceApp
+# Copier le projet complet
+COPY . .
 
 WORKDIR /app/pdfapi
-RUN chmod +x mvnw
-RUN ./mvnw -B -Dmaven.test.skip=true clean package
+
+# Utiliser Maven directement au lieu du wrapper
+RUN mvn -B -Dmaven.test.skip=true dependency:resolve
+RUN mvn -B -Dmaven.test.skip=true clean compile
+RUN mvn -B -Dmaven.test.skip=true package
 
 # Runtime image
-FROM eclipse-temurin:17-jre
+FROM openjdk:8-jre
 WORKDIR /app
 COPY --from=build /app/pdfapi/target/*.jar /app/app.jar
 
