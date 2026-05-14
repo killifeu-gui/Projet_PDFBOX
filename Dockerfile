@@ -14,7 +14,8 @@ RUN mvn -B -Dmaven.test.skip=true clean compile
 RUN mvn -B -Dmaven.test.skip=true package
 
 # Runtime image
-FROM openjdk:8-jre
+#FROM openjdk:8-jre
+FROM eclipse-temurin:8-jre
 WORKDIR /app
 COPY --from=build /app/pdfapi/target/*.jar /app/app.jar
 
