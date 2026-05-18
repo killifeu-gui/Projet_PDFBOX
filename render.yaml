@@ -6,13 +6,10 @@ services:
     envVars:
       - key: ORB_INITIAL_HOST
         value: localhost
-        scope: build
+        scope: runtime
       - key: ORB_INITIAL_PORT
         value: "1050"
-        scope: build
-      - key: PORT
-        value: "8080"
-        scope: build
+        scope: runtime
     plan: free
     region: oregon
     autoDeploy: true

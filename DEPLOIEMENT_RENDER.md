@@ -58,9 +58,10 @@ Remplissez les champs comme suit :
 
 | Key | Value | Scope |
 |-----|-------|-------|
-| `ORB_INITIAL_HOST` | `localhost` (ou votre IP CORBA) | Build & Runtime |
-| `ORB_INITIAL_PORT` | `1050` | Build & Runtime |
-| `PORT` | `8080` | Build & Runtime |
+| `ORB_INITIAL_HOST` | `<CORBA_HOST>` — hôte du serveur CORBA accessible depuis Render | Runtime |
+| `ORB_INITIAL_PORT` | `1050` | Runtime |
+
+> Important : n’utilisez `localhost` que pour les tests en local. Sur Render, le service CORBA doit être accessible depuis le cloud.
 
 ### 6. Plan et région
 
@@ -128,6 +129,7 @@ Render redéploiera automatiquement en 2-5 minutes.
 ### Port 8080 déjà utilisé
 - Render gère automatiquement les ports
 - Ne configurez pas `PORT` = 8080 dans les variables si Render l'assigne
+- Supprimez `PORT` de la configuration Render si vous utilisez Docker, car Render injecte déjà la bonne valeur au runtime
 
 ## Endpoints disponibles après déploiement
 
