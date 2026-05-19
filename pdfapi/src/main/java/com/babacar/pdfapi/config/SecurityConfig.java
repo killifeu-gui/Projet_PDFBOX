@@ -51,7 +51,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        // CORRECTION CORS : Utilisation de AllowedOriginPatterns au lieu de AllowedOrigins avec "*" + Credentials
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
@@ -78,6 +79,10 @@ public class SecurityConfig {
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .antMatchers("/auth/**").permitAll()
                         .antMatchers("/health").permitAll()
+                        // CORRECTION ROUTES : Autoriser l'accès public aux fonctionnalités du traitement PDF
+                        .antMatchers("/api/pdf/**").permitAll()
+                        // Si vos routes ne commencent pas par /api/pdf/, décommentez la ligne suivante et ajustez les noms :
+                        // .antMatchers("/fusionner", "/extraire", "/decouper").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
