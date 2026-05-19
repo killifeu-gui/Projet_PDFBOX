@@ -1,0 +1,43 @@
+# Build & compiled artifacts
+bin/
+target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+
+# Maven
+.mvn/
+pdfapi/.mvn/
+pdfapi/mvnw
+pdfapi/mvnw.cmd
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local runtime files
+ior*.txt
+orb.db/
+
+# Logs
+*.log
+mvnlog.txt
+
+# Test/temp
+test.txt
+*.tmp
+
+# Legacy/local client runners (no longer needed for cloud API)
+# CalculatriceClient/ - deprecated
+# CalculatriceServer/ - deprecated
+
+# Docker build cache (optional)
+.docker/
+.dockerignore

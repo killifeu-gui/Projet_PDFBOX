@@ -6,3 +6,14 @@ pdfapi/target
 .git
 .gitignore
 .DS_Store
+.idea
+.vscode
+*.iml
+ior*.txt
+orb.db
+test.txt
+*.bat
+CalculatriceClient
+CalculatriceServer
+.mvn
+
